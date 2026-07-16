@@ -61,3 +61,13 @@ def next_task_id():
     if not tasks:
         return 1
     return max(task["id"] for task in tasks) + 1
+
+@app.post("/tasks", status_code=status.HTTP_201_CREATED)
+def create_task(payload: TaskCreate):
+    task = {
+        "id": next_task_id(),
+        "title": payload.title,
+        "done": False
+    }
+    tasks.append(task)
+    return task
