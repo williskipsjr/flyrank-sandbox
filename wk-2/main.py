@@ -62,6 +62,9 @@ def next_task_id():
         return 1
     return max(task["id"] for task in tasks) + 1
 
+class TaskCreate(BaseModel):
+    title: str
+
 @app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(payload: TaskCreate):
     task = {
@@ -71,6 +74,8 @@ def create_task(payload: TaskCreate):
     }
     tasks.append(task)
     return task
+
+
 
 @app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(payload: TaskCreate):
