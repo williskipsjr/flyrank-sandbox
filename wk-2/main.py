@@ -1,3 +1,6 @@
+## Stage 0, 1 and 2 of the CRUD API project.
+
+
 from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
@@ -31,3 +34,24 @@ def get_task(task_id: int):
         if task["id"] == task_id:
             return task
     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+
+
+## Stage 3 : Create endpoints with validation and error handling
+
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel, field_validator
+
+class Task(BaseModel):
+    title: str
+
+    @field_validator('title')
+    @classmethod
+    def title_must_not_be_empty(cls, value: str):
+        if not value.strip():
+            raise ValueError("Title must not be empty")
+        return value
+    
+
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    done: bool | None = None
