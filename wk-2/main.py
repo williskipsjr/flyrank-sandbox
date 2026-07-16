@@ -88,3 +88,30 @@ def create_task(payload: TaskCreate):
     }
     tasks.append(task)
     return task
+
+
+## Stage 4: Creating the full CRUD by adding Update and Delete endpoints.
+
+@app.put("/tasks/{task_id}")
+def update_task(task_id: int, payload: TaskUpdate):
+    for task in tasks:
+        if task["id"] == task_id:
+            if payload.title is not None:
+                if not payload.title.strip():
+                    raise HTTPException(status_code=400, detail="Title must not be empty")
+                task['title'] = payload.title
+            if payload.done is not None:
+                task['done'] = payload.done
+            return task
+    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+
+
+
+@app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int):
+    for index, task in enumerate(tasks):
+        if task["id"] == task_id:
+            tasks.pop(index)
+            return None
+    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+
