@@ -55,3 +55,9 @@ class Task(BaseModel):
 class TaskUpdate(BaseModel):
     title: str | None = None
     done: bool | None = None
+
+
+def next_task_id():
+    if not tasks:
+        return 1
+    return max(task["id"] for task in tasks) + 1
