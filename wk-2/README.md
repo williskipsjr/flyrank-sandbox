@@ -128,7 +128,7 @@ Example JSON output:
 }
 ```
 
-![GET /](<assets/swagger ui screenshots/GET.png>)
+![GET /](<assets/swagger ui screenshots/1. GET.png>)
 
 ### 3) 2.1 GET - Health (`/health`)
 
@@ -146,7 +146,7 @@ Example JSON output:
 }
 ```
 
-![GET /health](<assets/swagger ui screenshots/GET -Health.png>)
+![GET /health](<assets/swagger ui screenshots/2. GET -Health.png>)
 
 ### 4) GET - List tasks (`/tasks`)
 
@@ -166,7 +166,7 @@ Example JSON output:
 ]
 ```
 
-![GET /tasks](<assets/swagger ui screenshots/GET - List Tasks.png>)
+![GET /tasks](<assets/swagger ui screenshots/3. GET - List Tasks.png>)
 
 ### 5) Uvicorn server
 
