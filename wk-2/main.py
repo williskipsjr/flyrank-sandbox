@@ -6,12 +6,14 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
-# In-memory task list for the CRUD demo.
-tasks = [
-    {"id": 1, "title": "Buy milk", "done": False},
-    {"id": 2, "title": "Walk the dog", "done": True},
-    {"id": 3, "title": "Read FastAPI docs", "done": False},
-]
+def seed_tasks() -> list[dict]:
+    return [
+        {"id": 1, "title": "Buy milk", "done": False},
+        {"id": 2, "title": "Walk the dog", "done": True},
+        {"id": 3, "title": "Read FastAPI docs", "done": False},
+    ]
+
+tasks = seed_tasks()
 
 
 class TaskCreate(BaseModel):
@@ -38,7 +40,7 @@ def root():
     return {
         "name": "Task API",
         "version": "1.0",
-        "endpoints": ["/tasks"],
+        "endpoints": ["/tasks", "/stats", "/reset"],
     }
 
 
@@ -47,11 +49,21 @@ def health():
     # Simple server health check.
     return {"status": "ok"}
 
+# optional to make filtering for listing tasks with keyword.
+@app.get("/tasks", summary="List tasks (with optional filtering/search)")
+def get_tasks(done: bool | None = None, search: str | None = None):
+    filtered = tasks
 
-@app.get("/tasks", summary="List all tasks")
-def get_tasks():
+    if done is not None:
+        filtered = [task for task in filtered if task["done"] == done]
+
+    if search is not None and search.strip():
+        term = search.strip().lower()
+        filtered = [task for task in filtered if term in task["title"].lower()]
+    return filtered
+
     # Return every task in memory.
-    return tasks
+    # return tasks
 
 
 @app.get("/tasks/{task_id}", summary="Get one task")
@@ -104,4 +116,23 @@ def delete_task(task_id: int):
             return None
 
     raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+
+
+@app.get("/stats", summary="Task stats")
+def get_stats():
+    total = len(tasks)
+    done = sum(1 for task in tasks if task["done"])
+    open_tasks = total - done
+    return {"total": total, "done": done, "open": open_tasks}
+
+@app.post("/reset", summary="Reset tasks to the starter set")
+def reset_tasks():
+    # Reset the task list to the original seed tasks.
+    tasks.clear()
+    tasks.extend(seed_tasks())
+    return {"message": "Tasks reset to starter data", "total": len(tasks)}
+
+
+
+
 
