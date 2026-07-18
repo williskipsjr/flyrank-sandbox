@@ -7,6 +7,7 @@ app = FastAPI()
 
 
 def seed_tasks() -> list[dict]:
+    # Starter data used on first boot and whenever /reset is called.
     return [
         {"id": 1, "title": "Buy milk", "done": False},
         {"id": 2, "title": "Walk the dog", "done": True},
@@ -49,21 +50,20 @@ def health():
     # Simple server health check.
     return {"status": "ok"}
 
-# optional to make filtering for listing tasks with keyword.
 @app.get("/tasks", summary="List tasks (with optional filtering/search)")
 def get_tasks(done: bool | None = None, search: str | None = None):
+    # Start from the full list, then apply optional filters.
     filtered = tasks
 
+    # done=true or done=false returns only matching completion state.
     if done is not None:
         filtered = [task for task in filtered if task["done"] == done]
 
+    # search=milk performs a case-insensitive title match.
     if search is not None and search.strip():
         term = search.strip().lower()
         filtered = [task for task in filtered if term in task["title"].lower()]
     return filtered
-
-    # Return every task in memory.
-    # return tasks
 
 
 @app.get("/tasks/{task_id}", summary="Get one task")
@@ -120,6 +120,7 @@ def delete_task(task_id: int):
 
 @app.get("/stats", summary="Task stats")
 def get_stats():
+    # Compute aggregate values from the current in-memory task list.
     total = len(tasks)
     done = sum(1 for task in tasks if task["done"])
     open_tasks = total - done
@@ -131,7 +132,6 @@ def reset_tasks():
     tasks.clear()
     tasks.extend(seed_tasks())
     return {"message": "Tasks reset to starter data", "total": len(tasks)}
-
 
 
 
